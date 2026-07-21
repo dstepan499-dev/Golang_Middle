@@ -8,13 +8,17 @@ import (
 func checkSite(url string) {
 	resp, err := http.Get(url)
 	if err != nil {
-		fmt.Println("Ошибка запроса:", err)
+		fmt.Printf("[FAIL] %s (ошибка: %v)\n", url, err)
 		return
 	}
 	
 	defer resp.Body.Close()
 
-	fmt.Println(resp)
+	if resp.StatusCode == http.StatusOK {
+		fmt.Printf("[OK]  %s\n", url)
+	} else {
+		fmt.Printf("[FAIL] %s (статус: %d)\n", url, resp.StatusCode)
+	}
 }
 
 func main() {
