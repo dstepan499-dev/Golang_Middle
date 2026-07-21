@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"sync"
 )
 
-func checkSite(url string) {
+func checkSite(url string, wg *sync.WaitGroup) {
+	defer wg.Done()
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Printf("[FAIL] %s (ошибка: %v)\n", url, err)
@@ -22,6 +24,7 @@ func checkSite(url string) {
 }
 
 func main() {
+	var wg sync.WaitGroup
 	sites := []string{
 		"https://google.com",
 		"https://github.com",
@@ -29,6 +32,9 @@ func main() {
 	}
 
 	for _, site := range sites {
-		checkSite(site)
+		wg.Add(1)
+		go checkSite(site, &wg)
 	}
+	
+	wg.Wait()
 }
