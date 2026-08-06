@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"sync"
+	"time"
 )
 
 type Result struct {
@@ -12,15 +14,16 @@ type Result struct {
 	Message string
 }
 
-func checkSite(url string, results chan<- Result, wg *sync.WaitGroup) {
+func checkSite(ctx context.Context, url string, results chan<- Result, wg *sync.WaitGroup) {
 	defer wg.Done()
-	resp, err := http.Get(url)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		results <- Result{URL: url, Success: false, Message: err.Error()}
 		return
 	}
 	
-	defer resp.Body.Close()
+	http.DefaultClient.Do(req)
+	defer req.Body.Close()
 
 	if resp.StatusCode == http.StatusOK {
 		results <- Result{URL: url, Success: true, Message: "OK"}
@@ -65,7 +68,9 @@ func main() {
 
 	for _, site := range sites {
 		wg.Add(1)
-		go checkSite(site, results, &wg)
+		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		go checkSite(ctx, site, results, &wg)
+		defer cancel()
 	}
 
 	go func() {
