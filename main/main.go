@@ -3,17 +3,17 @@ package main
 import "fmt"
 
 func main() {
-	var n int
+	var x, p, y int
+	fmt.Scan(&x, &p, &y)
 
-	for {
-		fmt.Scan(&n)
+	var total float64 = float64(x)
+	year := 0
 
-		if n > 100 {
-			break
-		} else if n < 10 {
-			continue
-		} else {
-			fmt.Println(n)
-		}
+	for int(total) < y {
+		year += 1
+		var percent float64 = total / 100 * float64(p)
+		total += percent
 	}
+
+	fmt.Println(year)
 }
