@@ -41,7 +41,7 @@ func main() {
 			}
 		}
 	default:
-		fmt.Println("Пошол НАХУЙ")
+		fmt.Println("default situation")
 	}
 
 	/*	for a > 0 {
